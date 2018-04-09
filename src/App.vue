@@ -27,12 +27,14 @@
       <span class="network" @click="network">配网</span>
       <span class="more" @click="more">更多</span>
     </div>
+    <mqttws></mqttws>
   </div>
 </template>
 
 <script>
   import {formatDate} from './common/date.js'
-  import pam from './common/mqttws3.1.js'
+  import mqttws from './components/mqtt.vue'
+//  import pam from './common/mqttws3.1.js'
   export default {
     name: 'App',
     data () {
@@ -47,30 +49,33 @@
           weather: '多云',
           outpm25: 67
         },
-        options: {
-          timeout: 5,
-          userName: 'hj',
-          password: '123456',
-          willMessage: {},
-          keepAliveInterval: 60,
-          cleanSession: false,
-          useSSL: false,
-          invocationContext: {},
-          onSuccess: this.onConnect,
-          onFailure: this.onConnectionLost,
-          hosts: '39.106.63.136',
-          ports: 443,
-          mqttVersion: 4
-        },
-        cli: new pam.MQTT(),
-        client: new pam.MQTT().Client('39.106.63.136',443,'clientId-NX75qTbKES'), // 第三个参数是clientID可以为空
-        topic: '001/in' // 订阅的主题
+//        options: {
+//          timeout: 5,
+//          userName: 'hj',
+//          password: '123456',
+//          willMessage: {},
+//          keepAliveInterval: 60,
+//          cleanSession: false,
+//          useSSL: false,
+//          invocationContext: {},
+//          onSuccess: this.onConnect,
+//          onFailure: this.onConnectionLost,
+//          hosts: '39.106.63.136',
+//          ports: 443,
+//          mqttVersion: 4
+//        },
+//        cli: new pam.MQTT(),
+//        client: new pam.MQTT().Client('39.106.63.136',443,'clientId-NX75qTbKES'), // 第三个参数是clientID可以为空
+//        topic: '001/in' // 订阅的主题
       }
+    },
+    components:{
+        mqttws
     },
     methods: {
       toggle () {
-          console.log('cli'+this.cli);
-          console.log(this.client);
+//          console.log('cli'+this.cli);
+//          console.log(this.client);
       },
       network () {
 
@@ -78,19 +83,19 @@
       more () {
 
       },
-      onConnectionLost: function (responseObject) {
-        if (responseObject.errorCode !== 0) {
-          console.log('onConnectionLost:' + responseObject.errorMessage)
-          console.log('连接已断开')
-        }
-      },
-      onMessageArrived: function (message) {
-        console.log('收到消息:' + message.payloadString)
-      },
-      onConnect: function () {
-        console.log('onConnected')
-        this.client.subscribe(this.topic)// 订阅主题
-      }
+//      onConnectionLost: function (responseObject) {
+//        if (responseObject.errorCode !== 0) {
+//          console.log('onConnectionLost:' + responseObject.errorMessage)
+//          console.log('连接已断开')
+//        }
+//      },
+//      onMessageArrived: function (message) {
+//        console.log('收到消息:' + message.payloadString)
+//      },
+//      onConnect: function () {
+//        console.log('onConnected')
+//        this.client.subscribe(this.topic)// 订阅主题
+//      }
     },
     filters: {
       formatDate (time) {
@@ -117,12 +122,12 @@
     },
     created: function() {
 //      var self = this;
-      console.log(this.cli);
-      console.log(this.client);
+//      console.log(this.cli);
+//      console.log(this.client);
 //      this.client.connect({onSuccess:onConnect}) // 连接服务器并注册连接成功处理事件
-      this.client.connect(this.options)
-      this.client.onConnectionLost = this.onConnectionLost // 注册连接断开处理事件
-      this.client.onMessageArrived = this.onMessageArrived // 注册消息接收处理事件
+//      this.client.connect(this.options)
+//      this.client.onConnectionLost = this.onConnectionLost // 注册连接断开处理事件
+//      this.client.onMessageArrived = this.onMessageArrived // 注册消息接收处理事件
       // this.client.disconnect(); // 断开连接
     }
   }
