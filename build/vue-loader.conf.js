@@ -11,6 +11,11 @@ module.exports = {
     sourceMap: sourceMapEnabled,
     extract: isProduction
   }),
+  postcss: [
+    require('postcss-cssnext')({
+      browsers: ['last 2 versions','Android >= 4.0']
+    })
+  ],
   cssSourceMap: sourceMapEnabled,
   cacheBusting: config.dev.cacheBusting,
   transformToRequire: {

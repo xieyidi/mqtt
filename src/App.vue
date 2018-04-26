@@ -1,212 +1,192 @@
 <template>
   <div id="app">
-    <div class="head">
-      <div class="left">
-        <span class="device-name">{{device.name}}</span>
-        <span class="device-status">{{device.status}}</span><br/>
-        <span class="date">{{device.date | formatDate}}</span>
+      <div id="list" v-if="onPageIndex">
+      <div class="device" v-for="item in deviceInfo">
+        <div class="imgWrap">
+          <img class="deviceIcon" :src="item.type"/>
+        </div>
+        <div class="deviceInfo">
+          <span class="macId">
+            {{item.macId}}<br/>
+          </span>
+          <img class="statusIcon" :src="item.state"/><br/>
+          <span class="deviceName">
+            {{item.deviceName}}
+          </span>
+        </div>
+        <div class="devide"><img class="line" src="../static/img/line.png"/></div>
+        <div class="wrapMore" @click="changePage">
+          <img class="imgMore" src="../static/img/go.png"/>
+        </div>
+        <div class="rightInfo">
+          <span class="indexTitle">PM2.5</span>
+          <span class="pmIndex">{{item.pm25}}</span>
+
+        </div>
+
       </div>
-      <div class="right"><span class="logo-top"></span></div>
-    </div>
-    <div class="middle cent">
-      <span>pm2.5</span>
-      <span>{{device.pm25}}</span>
-      <span>ug/m3</span>
-      <span>{{device.pm25 | grade}}</span>
-    </div>
-    <div class="intro cent">
-      <span>我是仪器{{device.type}}</span>
-    </div>
-    <div class="bottom cent">
-      <span>{{device.location}}</span>
-      <span>{{device.weather}}</span>
-      <span>PM2.5 {{device.outpm25}}{{device.outpm25 | grade}}</span>
-    </div>
-    <div class="nav cent">
-      <span class="toggle" @click="toggle">开关</span>
-      <span class="network" @click="network">配网</span>
-      <span class="more" @click="more">更多</span>
-    </div>
-    <mqttws></mqttws>
+      </div>
+
+      <div id="detailWrap" v-if="onPageDetail">
+        <DetailCmp></DetailCmp>
+      </div>
   </div>
 </template>
-
 <script>
-  import {formatDate} from './common/date.js'
-  import mqttws from './components/mqtt.vue'
-//  import pam from './common/mqttws3.1.js'
+  var bq = require("../static/img/bq.png");
+  var sq = require("../static/img/sq.png");
+  var c  = require("../static/img/c.png");
+  var on  = require("../static/img/online.png");
+
+  import DetailCmp from './components/detail'
+
   export default {
-    name: 'App',
-    data () {
-      return {
-        device: {
-          type: '小  Q-P',
-          name: '设备名称',
-          status: true,
-          date: new Date(),
-          pm25: 40,
-          location: '北京市 海淀区',
-          weather: '多云',
-          outpm25: 67
-        },
-//        options: {
-//          timeout: 5,
-//          userName: 'hj',
-//          password: '123456',
-//          willMessage: {},
-//          keepAliveInterval: 60,
-//          cleanSession: false,
-//          useSSL: false,
-//          invocationContext: {},
-//          onSuccess: this.onConnect,
-//          onFailure: this.onConnectionLost,
-//          hosts: '39.106.63.136',
-//          ports: 443,
-//          mqttVersion: 4
-//        },
-//        cli: new pam.MQTT(),
-//        client: new pam.MQTT().Client('39.106.63.136',443,'clientId-NX75qTbKES'), // 第三个参数是clientID可以为空
-//        topic: '001/in' // 订阅的主题
-      }
-    },
-    components:{
-        mqttws
-    },
-    methods: {
-      toggle () {
-//          console.log('cli'+this.cli);
-//          console.log(this.client);
-      },
-      network () {
-
-      },
-      more () {
-
-      },
-//      onConnectionLost: function (responseObject) {
-//        if (responseObject.errorCode !== 0) {
-//          console.log('onConnectionLost:' + responseObject.errorMessage)
-//          console.log('连接已断开')
-//        }
-//      },
-//      onMessageArrived: function (message) {
-//        console.log('收到消息:' + message.payloadString)
-//      },
-//      onConnect: function () {
-//        console.log('onConnected')
-//        this.client.subscribe(this.topic)// 订阅主题
-//      }
-    },
-    filters: {
-      formatDate (time) {
-        let date = new Date(time)
-        return formatDate(date, 'yyyy-MM-dd hh:mm')
-      },
-      grade (pm) {
-        let g = '未知'
-        if (pm < 35) {
-          g = '优'
-        } else if (pm < 75) {
-          g = '良'
-        } else if (pm < 115) {
-          g = '轻度污染'
-        } else if (pm < 150) {
-          g = '中度污染'
-        } else if (pm < 250) {
-          g = '重度污染'
-        } else {
-          g = '严重污染'
+    name:'list',
+    components:{ DetailCmp },
+    data(){
+        return{
+            onPageDetail:false,
+            onPageIndex:true,
+            //type有三种：大Q--bq 小Q--sq C--c
+            deviceInfo:[
+              {
+                'deviceName':'谷歌大厦五楼',
+                'type': bq,
+                'macId':'8900c234',
+                'state':on,
+                'pm25':30,
+                'deviceId':'123'
+              },
+              {
+                'deviceName':'宝马展厅',
+                'type': bq,
+                'macId':'8900c234',
+                'state':on,
+                'pm25':30,
+                'deviceId':'12'
+              }
+            ]
         }
-        return g
-      }
     },
-    created: function() {
-//      var self = this;
-//      console.log(this.cli);
-//      console.log(this.client);
-//      this.client.connect({onSuccess:onConnect}) // 连接服务器并注册连接成功处理事件
-//      this.client.connect(this.options)
-//      this.client.onConnectionLost = this.onConnectionLost // 注册连接断开处理事件
-//      this.client.onMessageArrived = this.onMessageArrived // 注册消息接收处理事件
-      // this.client.disconnect(); // 断开连接
+    methods:{
+        changePage(){
+            this.onPageDetail = true;
+            this.onPageIndex = false;
+        }
     }
   }
 </script>
-<style scoped lang="less">
-  @IMG_PATH : '../static/img';
-  #app{
+<style lang="postcss" scoped>
+  body{
+    margin:0;
+    padding:0;
+  }
+  #list{
+    margin-top: -10px;
+    padding-top: 30px;
     display: block;
     width: 100vw;
-    height: 675px;
+    height: 100vh;
+    background-color: rgb(25,24,102);
+    color: white;
   }
-  .head{
-    width: 100vw;
+  .device{
+    display: block;
+    width: 94%;
+    height:72px;
+    margin: 10px 3%;
+    background-color: rgba(255,255,255,.2);
+    overflow: hidden;
+    font-family: "Microsoft YaHei";
   }
-  .left{
+  .imgWrap{
+    display: block;
+    position:relative;
+    line-height: 60px;
+    /*text-align: center;*/
+    width: 70px;
+    height: 100%;
+    float: left;
+    margin-right: 10px;
+    /*border: 1px solid #fff;*/
+  }
+  .deviceInfo{
     display: inline-block;
-    box-sizing: border-box;
-    border: 1px solid #000;
-    width: 325px;
+    width: 45%;
+    height: 100%;
   }
-  .right{
+
+  .deviceIcon{
+    display:block;
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    /*vertical-align: middle;*/
+    width:40px;
+    height: 40px;
+  }
+  .macId{
+    display: inline-block;
+    padding-top: 12px;
+    color: rgba(255,255,255,.5);
+    font-size:15px;
+  }
+  .deviceName{
+    display: block;
+    padding-top: 2px;
+    font-size: 16px;
+    color: rgba(255,255,255,.8);
+  }
+  .devide{
+    display: inline-block;
+    height: 60%;
+    width: 15px;
+  }
+  .line{
+    display: inline-block;
+    /*float: right;*/
+    height: 100%;
+    width: 15px;
+
+  }
+  .rightInfo{
     display: inline-block;
     float: right;
-    width: 50px;
-    height: 50px;
+    width: 14%;
+    height: 70%;
   }
-  .logo-top{
+  .indexTitle{
     display: inline-block;
-    width: 100%;
-    height: 100%;
-    background-image: url("@{IMG_PATH}/logo.png");
-    background-position: center;
-    background-size: 100% 100%;
+    padding-top: 12px;
+    color: rgba(255,255,255,.5);
+    font-size:15px;
   }
-  .cent{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .pmIndex{
+    display: block;
+    font-size: 16px;
+    text-align: right;
+    padding-top: 0px;
+    color: rgba(255,255,255,.8);
   }
-  .middle{
-    width: 100%;
-    height: 200px;
-    margin: 25px auto;
-    flex-flow: column;
-    background-image: url("@{IMG_PATH}/greencircle.png");
-    background-size: auto 100%;
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
-  .bottom{
-    width: 100%;
-    height: 180px;
-    margin: 15px auto;
-    flex-flow: column;
-    background-image: url("@{IMG_PATH}/bluerect.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 70% 100%;
-  }
-  .nav{
-    color: #ffffff;
-    flex-flow: row;
-    width: 100%;
-    height: 80px;
-  }
-  .nav span{
+
+  .statusIcon{
     display: inline-block;
-    width: auto;
+    width: 13px;
+    height: 13px;
+  }
+  .wrapMore{
+    display: inline-block;
+    float: right;
+    width: 10%;
     height: 100%;
-    flex: 0 0 33%;
-    background-image: url("@{IMG_PATH}/rhombus.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: auto 100%;
-    line-height: 80px;
+    vertical-align: middle;
     text-align: center;
+    padding-top: 19px;
   }
-  .middle span{
-    flex: 0 0 25%;
-    line-height: 45px;
+  .imgMore{
+    width: 20%;
+    height: 20%;
   }
 </style>
